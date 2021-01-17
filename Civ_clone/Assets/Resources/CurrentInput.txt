@@ -1,0 +1,10 @@
+#use hashtags for comments
+#action : key, key, key
+
+up : w
+left : a
+down : s
+right : d
+rotate : q, e
+rotate_left : q
+rotate_right : e

@@ -17,7 +17,7 @@ public class InputManager : MonoBehaviour
             {
                 n += s + ", ";
             }
-            print(key + " : " + n);
+            //print(key + " : " + n);
         }
     }
 

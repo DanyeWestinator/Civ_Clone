@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public float rotationSpeed = 1f;
+    public float moveSpeed = 1f;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,6 +16,7 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         RotateCamera();
+        MoveCamera();
     }
 
     void RotateCamera()
@@ -28,5 +30,22 @@ public class CameraController : MonoBehaviour
         Vector3 currentRotation = transform.eulerAngles;
         currentRotation.y += direction * Time.deltaTime * rotationSpeed;
         transform.eulerAngles = currentRotation;
+    }
+
+    void MoveCamera()
+    {
+        int zMove = 0;
+        int xMove = 0;
+        if (InputManager.GetKey("up"))
+            zMove = 1;
+        if (InputManager.GetKey("down"))
+            zMove = -1;
+        if (InputManager.GetKey("left"))
+            xMove = -1;
+        if (InputManager.GetKey("right"))
+            xMove = 1;
+        Vector3 toMove = new Vector3(xMove, 0f, zMove);
+        toMove *= Time.deltaTime * moveSpeed;
+        transform.position = transform.position += toMove;
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
-    private static Dictionary<Vector3Int, GameObject> blockByPos = new Dictionary<Vector3Int, GameObject>();
+    private static Dictionary<Vector2Int, GameObject> blockByPos = new Dictionary<Vector2Int, GameObject>();
     [SerializeField]
     public GameObject MapHolder;
     public static Tilemap grid;
@@ -26,10 +26,10 @@ public class GameManager : MonoBehaviour
 
     void PopulateBlockByPos()
     {
-        blockByPos = new Dictionary<Vector3Int, GameObject>();
+        blockByPos = new Dictionary<Vector2Int, GameObject>();
         foreach (GameObject go in GetChildren(MapHolder))
         {
-            Vector3Int pos = Vector3Int.RoundToInt(go.transform.position);
+            Vector2Int pos = new Vector2Int((int)go.transform.position.x, (int)go.transform.position.z * -1);
             if (blockByPos.ContainsKey(pos) == false)
                 blockByPos.Add(pos, go);
         }
@@ -51,55 +51,67 @@ public class GameManager : MonoBehaviour
 
         return toReturn;
     }
-    public static GameObject GetBlockByPos(Vector3Int pos)
+    public static GameObject GetBlockByPos(Vector2Int pos)
     {
         if (blockByPos.ContainsKey(pos))
             return blockByPos[pos];
         return null;
     }
-    public static string GetTagByPos(Vector3Int pos)
+    public static string GetTagByPos(Vector2Int pos)
     {
-        if (pos.y != 0 && pos.z == 0)
-        {
-            pos.z = pos.y * -1;
-            pos.y = 0;
-        }
         if (blockByPos.ContainsKey(pos))
             return blockByPos[pos].tag;
         return "";
     }
     private void SetAllTileFlags(TileFlags flag = TileFlags.None)
     {
-        foreach (Vector3Int tile in GetAllTiles())
+        foreach (Vector2Int tile in GetAllTiles())
         {
-            grid.SetTileFlags(tile, flag);
+            grid.SetTileFlags((Vector3Int)tile, flag);
         }
     }
     //gets all the tiles in a tilemap
-    public static HashSet<Vector3Int> GetAllTiles(Tilemap tiles = null)
+    public static HashSet<Vector2Int> GetAllTiles(Tilemap tiles = null)
     {
         if (tiles == null)
             tiles = grid;
         //gets all the tiles in a given tilemap
-        HashSet<Vector3Int> filledTiles = new HashSet<Vector3Int>();
+        HashSet<Vector2Int> filledTiles = new HashSet<Vector2Int>();
         for (int x = tiles.cellBounds.xMin; x < tiles.cellBounds.xMax; x++)
         {
             for (int y = tiles.cellBounds.yMin; y < tiles.cellBounds.yMax; y++)
             {
                 if (tiles.GetTile(new Vector3Int(x, y, 0)) != null)
                 {
-                    filledTiles.Add(new Vector3Int(x, y, 0));
+                    filledTiles.Add(new Vector2Int(x, y));
                 }
             }
         }
         return filledTiles;
     }
-    public static Vector3Int WorldspaceToTilemap(Vector3 pos)
+    public static Vector2Int WorldspaceToTilemap(Vector3 pos)
     {
-        Vector3Int tilePos = Vector3Int.RoundToInt(pos);
-        tilePos.y = tilePos.z * -1;
-        tilePos.z = 0;
+        Vector2Int tilePos = new Vector2Int((int)pos.x, -1 * (int)pos.z);
+        
 
         return tilePos;
+    }
+    public static Vector3 TileToWorldSpace(Vector2Int pos)
+    {
+        Vector3 worldPos = new Vector3(pos.x, 0f, pos.y * -1f);
+        return worldPos;
+    }
+    public static void SetGridColor(Vector2Int pos, Color color)
+    {
+        Vector3Int newPos = new Vector3Int(pos.x, pos.y, 0);
+        grid.SetColor(newPos, color);
+    }
+    public static Color GetGridColor(Vector2Int pos) { return grid.GetColor(new Vector3Int(pos.x, pos.y, 0)); }
+    public static bool TagContains(Vector2Int pos, string contains)
+    {
+        string s = blockByPos[pos].tag;
+        s = s.ToLower();
+        contains = contains.ToLower();
+        return s.Contains(contains);
     }
 }

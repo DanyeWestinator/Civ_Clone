@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    Vector3Int lastPos = Vector3Int.zero;
+    Vector2Int lastPos = Vector2Int.zero;
     private Color originalColor = Color.white;
     public Color HoverColor = Color.grey;
-    Vector3Int lastTilePos = Vector3Int.zero;
+    Vector2Int lastTilePos = Vector2Int.zero;
 
 
     // Update is called once per frame
@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
             Clicked();
         MoveCursor();
         lastPos = GetMousePosition();
-        lastTilePos = GetTilePosition();
+        lastTilePos = GetMousePosition();
     }
     void Clicked()
     {
@@ -25,7 +25,7 @@ public class GameController : MonoBehaviour
         
         GameManager.GetBlockByPos(GetMousePosition()).SetActive(false);
     }
-    private Vector3Int GetMousePosition()
+    private Vector2Int GetMousePosition()
     {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -33,25 +33,22 @@ public class GameController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit))
         {
-            return Vector3Int.RoundToInt(hit.collider.gameObject.transform.position);
+            Vector3 hitPos = hit.collider.gameObject.transform.position;
+            return new Vector2Int((int)hitPos.x, -1 * (int)hitPos.z);
+
+            //return Vector3Int.RoundToInt(hit.collider.gameObject.transform.position);
         }
-        return Vector3Int.up;
+        return Vector2Int.up;
     }
-    private Vector3Int GetTilePosition()
-    {
-        Vector3Int tilePos = GetMousePosition();
-        tilePos.y = tilePos.z * -1;
-        tilePos.z = 0;
-        return tilePos;
-    }
+    
     void MoveCursor()
     {
-        if (lastTilePos != GetTilePosition())
+        if (lastTilePos != GetMousePosition())
         {
-            GameManager.grid.SetColor(lastTilePos, originalColor);
-            lastTilePos = GetTilePosition();
-            originalColor = GameManager.grid.GetColor(lastTilePos);
-            GameManager.grid.SetColor(lastTilePos, HoverColor);
+            GameManager.SetGridColor(lastTilePos, originalColor);
+            lastTilePos = GetMousePosition();
+            originalColor = GameManager.GetGridColor(lastTilePos); 
+            GameManager.SetGridColor(lastTilePos, HoverColor);
         }
     }
 }

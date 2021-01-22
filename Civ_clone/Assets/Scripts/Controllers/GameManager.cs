@@ -5,13 +5,21 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
-    private static Dictionary<Vector2Int, GameObject> blockByPos = new Dictionary<Vector2Int, GameObject>();
+    public static Dictionary<Vector2Int, GameObject> blockByPos = new Dictionary<Vector2Int, GameObject>();
     [SerializeField]
     public GameObject MapHolder;
     public static Tilemap grid;
     public GameObject gridParent;
+    public static GameManager instance = null;
+    private void Awake()
+    {
+        if (instance == null || instance == this)
+            instance = this;
+        else
+            Destroy(this.gameObject);
+    }
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         grid = gridParent.transform.GetChild(0).GetComponent<Tilemap>();
         PopulateBlockByPos();
@@ -23,8 +31,8 @@ public class GameManager : MonoBehaviour
     {
         
     }
-
-    void PopulateBlockByPos()
+    
+    public void PopulateBlockByPos()
     {
         blockByPos = new Dictionary<Vector2Int, GameObject>();
         foreach (GameObject go in GetChildren(MapHolder))
@@ -33,7 +41,7 @@ public class GameManager : MonoBehaviour
             if (blockByPos.ContainsKey(pos) == false)
                 blockByPos.Add(pos, go);
         }
-        //print("Counted: " + blockByPos.Count + " and added them to the count");
+        print("Counted: " + blockByPos.Count + " and added them to the count");
     }
 
     private HashSet<GameObject> GetChildren(GameObject go)
@@ -109,9 +117,12 @@ public class GameManager : MonoBehaviour
     public static Color GetGridColor(Vector2Int pos) { return grid.GetColor(new Vector3Int(pos.x, pos.y, 0)); }
     public static bool TagContains(Vector2Int pos, string contains)
     {
-        string s = blockByPos[pos].tag;
+        string s = "NULL";
+        if (blockByPos.ContainsKey(pos))
+            s = blockByPos[pos].tag;
         s = s.ToLower();
         contains = contains.ToLower();
         return s.Contains(contains);
     }
+    public static bool IsWater(Vector2Int pos) { return TagContains(pos, "water"); }
 }

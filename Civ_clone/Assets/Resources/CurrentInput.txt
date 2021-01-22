@@ -8,3 +8,4 @@ right : d
 rotate : q, e
 rotate_left : q
 rotate_right : e
+home : h

@@ -28,18 +28,19 @@ public class Action : MonoBehaviour
     }
     private HashSet<Vector2Int> RecursiveFinder(Vector2Int center, int depth)
     {
+        recursiveCalls++;
         HashSet<Vector2Int> toReturn = new HashSet<Vector2Int>();
         if (depth <= 0)
             return toReturn;
         toReturn = GetValid(center);
-        visited.Add(center);
-        recursiveCalls++;
+        
+        
         foreach (Vector2Int next in GetValid(center))
         {
-            toReturn.UnionWith(RecursiveFinder(next, depth - 1));
+            toReturn.UnionWith(RecursiveFinder(next, depth - Pathfinding.GetDistance(next, center)));
         }
 
-
+        visited.Add(center);
         return toReturn;
     }
 
@@ -53,10 +54,9 @@ public class Action : MonoBehaviour
             for (int j = -1; j < 2; j++)
             {
                 Vector2Int next = new Vector2Int(center.x + i, center.y + j);
-                //print(next);
                 if (next != center && IsValidTile(next))
                 {
-                    print(GameManager.GetTagByPos(next) + " " + next);
+                    //print(GameManager.GetTagByPos(next) + " " + next);
                     valid.Add(next);
                 }
                     
@@ -67,8 +67,9 @@ public class Action : MonoBehaviour
 
     public void MarkValid()
     {
-        MarkedValid = GetValid(GameManager.WorldspaceToTilemap(transform.position));
+        //MarkedValid = GetValid(GameManager.WorldspaceToTilemap(transform.position));
         MarkedValid = RecursiveFinder(position, MaxDistance);
+        visited = new HashSet<Vector2Int>();
         foreach (Vector3Int tile in MarkedValid)
         {
             GameManager.grid.SetColor(tile, markedColor);
@@ -80,6 +81,8 @@ public class Action : MonoBehaviour
         if (GameManager.TagContains(tile, "Water"))
             return false;
         if (visited.Contains(tile))
+            return false;
+        if (GameManager.TagContains(tile, "null"))
             return false;
         return true;
     }

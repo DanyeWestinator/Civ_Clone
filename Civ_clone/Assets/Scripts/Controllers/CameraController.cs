@@ -6,10 +6,13 @@ public class CameraController : MonoBehaviour
 {
     public float rotationSpeed = 1f;
     public float moveSpeed = 1f;
+    private Vector3 startPos;
+    private Vector3 startRotation;
     // Start is called before the first frame update
     void Start()
     {
-        
+        startPos = transform.position;
+        startRotation = transform.GetChild(0).rotation.eulerAngles;
     }
 
     // Update is called once per frame
@@ -17,6 +20,8 @@ public class CameraController : MonoBehaviour
     {
         RotateCamera();
         MoveCamera();
+        if (InputManager.GetKeyDown("home") || Input.GetKeyDown(KeyCode.Return))
+            Reset();
     }
 
     void RotateCamera()
@@ -47,5 +52,12 @@ public class CameraController : MonoBehaviour
         Vector3 toMove = new Vector3(xMove, 0f, zMove);
         toMove *= Time.deltaTime * moveSpeed;
         transform.position = transform.position += toMove;
+    }
+
+    public void Reset()
+    {
+        transform.position = startPos;
+        transform.GetChild(0).eulerAngles = startRotation;
+        transform.eulerAngles = Vector3.zero;
     }
 }

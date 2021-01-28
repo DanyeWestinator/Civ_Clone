@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public static Tilemap grid;
     public GameObject gridParent;
     public static GameManager instance = null;
+    private static bool started = false;
+
     private void Awake()
     {
         if (instance == null || instance == this)
@@ -24,6 +26,15 @@ public class GameManager : MonoBehaviour
         grid = gridParent.transform.GetChild(0).GetComponent<Tilemap>();
         PopulateBlockByPos();
         SetAllTileFlags();
+        started = true;
+    }
+    public static void CheckStart()
+    {
+        if (instance == null || started == false)
+        {
+            instance = GameObject.Find("GameManager").GetComponent<GameManager>();
+        }
+        instance.Start();
     }
 
     // Update is called once per frame
@@ -41,7 +52,6 @@ public class GameManager : MonoBehaviour
             if (blockByPos.ContainsKey(pos) == false)
                 blockByPos.Add(pos, go);
         }
-        print("Counted: " + blockByPos.Count + " and added them to the count");
     }
 
     private HashSet<GameObject> GetChildren(GameObject go)

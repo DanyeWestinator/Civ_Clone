@@ -22,7 +22,7 @@ public class GameController : MonoBehaviour
     void Clicked()
     {
         //print("clicked");
-        
+        print("Removing: " + GetMousePosition());
         GameManager.GetBlockByPos(GetMousePosition()).SetActive(false);
     }
     private Vector2Int GetMousePosition()

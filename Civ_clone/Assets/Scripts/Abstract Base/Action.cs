@@ -26,7 +26,7 @@ public class Action : MonoBehaviour
             MarkValid();
         }
     }
-    private HashSet<Vector2Int> RecursiveFinder(Vector2Int center, int depth)
+    private HashSet<Vector2Int> RecursiveFinder(Vector2Int center, float depth)
     {
         recursiveCalls++;
         HashSet<Vector2Int> toReturn = new HashSet<Vector2Int>();
